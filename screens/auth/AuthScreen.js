@@ -232,7 +232,6 @@ const AuthScreen = (props) => {
             <View style={styles.container}>
                 <Image style={styles.bgImage} source={require('../../assets/bg-auth.png')} />
                 <View style={styles.titleContainer} >
-                    <Text style={styles.title}>SocialApp</Text>
                 </View>
 
                 {/* { error !== null && (
@@ -333,7 +332,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#DCDCDC',
     },
     titleContainer: {
-        marginBottom: 40,
+        marginBottom: 10,
+        marginTop:50,
     },  
     title: {
         fontSize: 42,

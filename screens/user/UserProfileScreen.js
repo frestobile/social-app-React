@@ -1,4 +1,5 @@
-import React, {useCallback, useState} from "react";
+import React, {useState, useCallback, useEffect, useRef} from 'react';
+
 import {
     View,
     Text,
@@ -29,8 +30,46 @@ import MenuItem from "../../components/UI/MenuItem";
 import { showMessage } from "react-native-flash-message";
 import VerifiedUser from "../../constants/VerifiedUser";
 
+// import * as postsActions from '../../store/actions/posts';
+// import * as usersActions from '../../store/actions/users';
+import * as chatActions from '../../store/actions/chat';
 
 const UserProfileScreen = (props) => {
+
+
+    
+    const [error, setError] = useState();
+
+
+    // const loadPosts = useCallback(async () => {
+    //     setError(null);
+    //     setIsRefreshing(true);
+    //     try {
+    //         await dispatch(postsActions.fetchPosts());
+    //         await dispatch(usersActions.fetchUsers());
+    //         await dispatch(chatActions.fetchChatList());
+
+    //     } catch (err) {
+    //         setError(err.message);
+    //     }
+    //     setIsRefreshing(false);
+    // }, [dispatch, setIsLoading, setError])
+
+
+
+    useEffect(() => {
+        // setIsLoading(true);
+        // loadPosts()
+        dispatch(usersActions.fetchUsers());
+        // .then(() => {
+        //     setIsLoading(false);
+        // });
+    }, [])
+
+
+
+
+
     const { route } = props;
     const loggedInUserId = useSelector(state => state.auth.user._id);
     const allUsers = useSelector(state => state.users.allUsers);
@@ -48,6 +87,8 @@ const UserProfileScreen = (props) => {
     const posts = useSelector(state => state.posts.allPosts);
     const currUser = users.filter(u => u._id === userId)[0];
     const currUserPosts = posts.filter(p => p.postedBy._id === userId);
+
+    const loggedUser = useSelector(state => state.auth.user);
     
     const [isRefreshing,setIsRefreshing] = useState(false);
     const [isLoading,  setIsLoading] = useState(false);
@@ -111,17 +152,17 @@ const UserProfileScreen = (props) => {
 
 
 
-    const renderSectionOne = () => {
+    const RenderSectionOne = () => {
         if(currUserPosts.length === 0 ){
             return(
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderTopColor: '#c2c2c2', borderTopWidth: 1 }} >   
-                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 25 }} >No Posts</Text>
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', marginTop: 25 }} >No Topics</Text>
                     { currUser._id === loggedInUserId && (
                         <Button
                             style={{ backgroundColor: Colors.brightBlue, padding: 10, borderRadius: 25, marginTop: 15 }}
                             onPress={() => props.navigation.navigate('AddPost')}
                         >
-                            <Text style={{ color: '#fff' }} >Create Post</Text>
+                            <Text style={{ color: '#fff' }} >Create Topic</Text>
                         </Button>
                     ) }
                     
@@ -157,10 +198,10 @@ const UserProfileScreen = (props) => {
         })
     }
 
-    const renderSection = () => {
+    const RenderSection = () => {
             return (
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
-                    {renderSectionOne()}
+                    <RenderSectionOne />
                 </View>
             )
     }
@@ -183,11 +224,11 @@ const UserProfileScreen = (props) => {
 
     return (
         <Container style={styles.container} >
-            <Content 
+            {/* <Content 
                 refreshControl={
                     <RefreshControl refreshing={isRefreshing} onRefresh={loadUsers} /> 
                 } 
-            >
+            > */}
                 <View style={{ paddingTop: 20 }}>
                     {/** User Photo Stats**/}
                     <View style={{ flexDirection: 'row' }}>
@@ -326,9 +367,9 @@ const UserProfileScreen = (props) => {
 
 
                 <View>
-                    {renderSection()}
+                    <RenderSection />
                 </View>
-            </Content>
+            {/* </Content> */}
         
         </Container >
     );
@@ -369,8 +410,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white'
+    },
+    BenefitsScreen: {
+        display: "none"
     }
 });
 
 export default UserProfileScreen;
-

@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator, FlatList, Text } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-
+import * as authActions from '../../store/actions/auth';
 import * as chatActions from '../../store/actions/chat';
 import Colors from '../../constants/Colors';
 import ChatListItem from '../../components/UI/ChatListItem';
 import { Container, Header, Item, Input, Icon } from 'native-base';
+import { useFocusEffect } from '@react-navigation/core';
 
 const ChatListScreen = (props) => {
 
@@ -46,6 +47,18 @@ const ChatListScreen = (props) => {
         }
     }, [dispatch, setIsLoading])
 
+    useFocusEffect(
+        React.useCallback(()=> {
+            changeTabRoute(true)
+            return () => {
+                changeTabRoute(false)
+            }
+        })
+    )
+
+    const changeTabRoute = async (status) => {
+        await dispatch(authActions.changeSocialState(status))
+    }
 
     // useEffect(() => {
     //     const unsubscribe = props.navigation.addListener('focus', e => {
@@ -100,7 +113,7 @@ const ChatListScreen = (props) => {
                     <Input
                         value={searchText}
                         onChangeText={(text) => handleSearchTextChange(text)}
-                        placeholder="Search" 
+                        placeholder="Enter the name of the officer" 
                     />
                     <Icon name="ios-people" />
                 </Item>

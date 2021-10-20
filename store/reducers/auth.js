@@ -1,9 +1,10 @@
-import { AUTHENTICATE, SET_DID_TRY_AUTO_LOGIN, LOGOUT } from "../actions/auth";
+import { AUTHENTICATE, SET_DID_TRY_AUTO_LOGIN, LOGOUT, IS_SOCIAL_ACTIVE } from "../actions/auth";
 
 const initialState = {
     token: null,
     user: null,
-    didTryAutoLogin: false
+    didTryAutoLogin: false,
+    isSocial: false
 };
 
 export default (state=initialState, action) => {
@@ -24,6 +25,11 @@ export default (state=initialState, action) => {
                 ...initialState,
                 didTryAutoLogin: true
             };
+        case IS_SOCIAL_ACTIVE:
+            return {
+                ...state,
+                isSocial: action.isSocial
+            }
         default:
             return state;
     }

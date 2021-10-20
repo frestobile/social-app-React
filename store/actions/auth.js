@@ -4,7 +4,7 @@ import ENV from '../../env';
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOGOUT = 'LOGOUT';
 export const SET_DID_TRY_AUTO_LOGIN  = 'SET_DID_TRY_AUTO_LOGIN';
-
+export const IS_SOCIAL_ACTIVE = 'IS_SOCIAL_ACTIVE';
 
 
 export const setDidTryAutoLogin = () => {
@@ -112,4 +112,13 @@ const saveDataToStorage = (token, user) => {
         token,
         user
     }));
+}
+
+export const changeSocialState = (isSocial) => {
+    return dispatch => {
+        dispatch({
+            type: IS_SOCIAL_ACTIVE,
+            isSocial
+        });
+    }
 }

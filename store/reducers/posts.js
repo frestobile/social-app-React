@@ -1,7 +1,8 @@
-import { SET_POSTS, CREATE_POST, DELETE_POST, UPDATE_POST, LIKE_POST, UNLIKE_POST, COMMENT_POST, UNCOMMENT_POST, ADD_COMMENT_TEMP } from "../actions/posts";
+import { SET_POSTS, SET_POSTS_BOARD, CREATE_POST, DELETE_POST, UPDATE_POST, LIKE_POST, UNLIKE_POST, COMMENT_POST, UNCOMMENT_POST, ADD_COMMENT_TEMP } from "../actions/posts";
 
 const initialState = {
     allPosts: [],
+    allBoardPosts: [],
 };
 
 export default (state=initialState, action) => {
@@ -10,6 +11,13 @@ export default (state=initialState, action) => {
             return {
                 ...state,
                 allPosts: action.posts
+            }
+        case SET_POSTS_BOARD:
+            return {
+                // ...state,
+                // allBoardPosts: action.boardPosts
+                ...state,
+                allBoardPosts: action.posts
             }
 
         case CREATE_POST:

@@ -47,9 +47,9 @@ const EditProfileScreen = (props) => {
         let sizeInBytes = 4 * Math.ceil((strLength / 3))*0.5624896334383812;
         let sizeInKb = sizeInBytes/1000;
         console.log(sizeInKb);
-        if(sizeInKb > 100){
+        if(sizeInKb > 10000){
             showMessage({
-                message: "Image size should be less than 150KB.",
+                message: "Image size should be less than 10MB.",
                 type: "danger",
                 icon: { icon: "danger", position: 'left' }
             });
@@ -115,6 +115,7 @@ const EditProfileScreen = (props) => {
         setIsLoading(true);
         if(validatePost()){
             try {
+                console.log('Valid Update!')
                 await dispatch(usersActions.updateProfile(name, email, about, password, base64Data, imageType));
                 clearForm();
                 props.navigation.navigate('YourProfile', { screen: 'UserProfile' });
@@ -130,7 +131,7 @@ const EditProfileScreen = (props) => {
                     type: "danger",
                     icon: { icon: "danger", position: 'left' }
                 });
-                console.log("ERROR ",error.message);
+                console.log("ERROR Profile Err here is the problem!! --> ",error.message);
             }
         } 
         setIsLoading(false);
@@ -142,6 +143,7 @@ const EditProfileScreen = (props) => {
     }
 
     return(
+        <View style={{flex: 1}}>
         <ScrollView>
             <KeyboardAvoidingView style={styles.screen} >
                 <View style={styles.container}>
@@ -186,11 +188,11 @@ const EditProfileScreen = (props) => {
                     </View>
 
                     <View style={styles.labelContainer} >
-                        <Text style={styles.labelText} >About</Text>
+                        <Text style={styles.labelText} >About Officer</Text>
                     </View>
                     <View style={styles.inputContainer}>
                         <TextInput style={styles.inputs}
-                            placeholder="About"
+                            placeholder="About Officer"
                             underlineColorAndroid='transparent'
                             value={about}
                             onChangeText={(text) => setAbout(text) }
@@ -210,26 +212,31 @@ const EditProfileScreen = (props) => {
                         />
                     </View>
 
-                    <TouchableOpacity 
-                        style={[styles.buttonContainer, styles.loginButton]}
-                        onPress={updatePost}
-                    >
-
-                        { isLoading ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                        )  :(
-                            <Text style={styles.loginText}>
-                                Update
-                            </Text>
-                        ) }
-                        
-                    </TouchableOpacity>
 
                     </View>   
                 
             </KeyboardAvoidingView>
 
         </ScrollView>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+
+        <TouchableOpacity 
+                        style={[styles.buttonContainer, styles.loginButton]}
+                        onPress={updatePost}
+                    >
+
+                        { isLoading ? (
+                            <ActivityIndicator size="large" color="#fff" />
+                        )  :(
+                            <Text style={styles.loginText}>
+                                Update Profile
+                            </Text>
+                        ) }
+                        
+                    </TouchableOpacity>   
+        </View> 
+        </View>
+        
     );
 };
 
@@ -315,7 +322,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
         width: 300,
         borderRadius: 30,
         backgroundColor: 'transparent'

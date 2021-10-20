@@ -1,0 +1,230 @@
+import React, {useState, useCallback, useEffect, useRef} from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ActivityIndicator, Button, Platform, AsyncStorage, Col, Row, Grid } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { FlatGrid } from 'react-native-super-grid';
+import Card from '../../components/UI/Card';
+import Colors from '../../constants/Colors';
+
+import * as postsActions from '../../store/actions/posts';
+import * as usersActions from '../../store/actions/users';
+import * as chatActions from '../../store/actions/chat';
+import { color } from 'react-native-reanimated';
+
+
+const AllPostsScreen = (props) => {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [error, setError] = useState();
+
+    const refPosts = useRef(null);
+
+    const posts = useSelector(state => state.posts.allPosts);
+    const loggedUser = useSelector(state => state.auth.user);
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+
+
+    const loadPosts = useCallback(async () => {
+        setError(null);
+        setIsRefreshing(true);
+        try {
+            await dispatch(postsActions.fetchPosts());
+            await dispatch(usersActions.fetchUsers());
+            await dispatch(chatActions.fetchChatList());
+
+        } catch (err) {
+            setError(err.message);
+        }
+        setIsRefreshing(false);
+    }, [dispatch, setIsLoading, setError])
+ 
+    
+    const toggleLikeHandler = async (postId, isLiked) => {
+        
+        try {
+            if(isLiked){
+                await dispatch(postsActions.unlikePost(postId))
+            } else {
+                await dispatch(postsActions.likePost(postId))
+            }
+        } catch (error) {
+            console.log("ERROR ", error)
+        }
+    }
+    const GetSocialButton = ({ onPress, title }) => (
+        <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+          <Text style={styles.appButtonText}>{title}</Text>
+        </TouchableOpacity>
+    );
+
+    const BenefitsButton = ({ onPress, title }) => (
+        <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+          <Text style={styles.appButtonText}>{title}</Text>
+        </TouchableOpacity>
+    );
+
+    const MinutesButton = ({ onPress, title }) => (
+        <TouchableOpacity onPress={onPress} style={styles.appButtonContainer}>
+          <Text style={styles.appButtonText}>{title}</Text>
+        </TouchableOpacity>
+    );
+
+    const [items, setItems] = React.useState([
+        { name: 'Lets Get Social', code: '#8e97fd', description: 'Have a shift you need covered? Hosting a BBQ? Start posting and get in touch with your fellow officers.' },
+        { name: 'Explore Benefits', code: '#ffc97e', description: 'Discounts on tickets, legal aid, peer support, resources and libraries of documents you may need for yourself. Let’s get exploring '  },
+        { name: 'Meeting Minutes', code: '#3498db', description: 'Getting the info about the Meeting minutes ' , button: MinutesButton },
+      ]);
+
+    // useEffect(() => {
+    //     const unsubscribe = props.navigation.addListener('focus', loadPosts);
+
+    //     return () => {
+    //         unsubscribe();
+    //     };
+    // }, [loadPosts])
+    useEffect(() => {
+        const unsubscribe = navigation.dangerouslyGetParent().addListener('tabPress', e => {
+            console.log("TAB PRESSED");
+            if(refPosts.current){
+                refPosts.current.scrollToIndex({ animated: true, index: 0 });
+            }
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [])
+
+    useEffect(() => {
+        setIsLoading(true);
+        loadPosts()
+        .then(() => {
+            setIsLoading(false);
+        });
+    }, [dispatch, loadPosts])
+
+    if(error){
+        return (
+            <View style={styles.centered} >
+                <Text>An error occured.</Text>
+                <Button title="Try again" onPress={loadPosts} color={Colors.primary} />
+            </View>
+        );
+    }
+
+
+    if(isLoading){
+        return (
+            <View style={styles.centered} >
+                <ActivityIndicator size='large' color={Colors.primary} />
+            </View>
+        );
+    }
+
+
+    if(!isLoading && posts.length === 0){
+        return(
+            <View style={styles.centered} >
+                <Text>No posts found. Maybe start adding some!</Text>
+            </View>
+        );
+    }
+
+    return (
+            <FlatGrid
+                itemDimension={280}
+                data={items}
+                style={styles.gridView}
+                // staticDimension={300}
+                // fixed
+                spacing={20}
+                renderItem={({ item }) => (
+                    <View style={[styles.itemContainer, { backgroundColor: item.code }]}>
+                    <Text style={styles.itemName}>{item.name}</Text>
+                    <Text style={styles.itemDescription}>{item.description}</Text>
+                    <Text style={styles.itemCode}>{item.button}</Text>
+                    </View>
+                )}
+                />
+    );
+};
+
+
+
+export const screenOptions = (navData) => {
+    return{
+        headerTitle: 'Smpoa',
+        // headerRight: () => (
+        //     <Ionicons
+        //         name={Platform.OS === 'android' ? 'md-people' : 'ios-chatboxes'}
+        //         size = {24}
+        //         color={Platform.OS === 'android' ? '#fff' : Colors.brightBlue}
+        //         style={{  padding: 15, marginRight: 5 }}
+        //         onPress={() => navData.navigation.navigate('Social')}
+        //     />
+        // )
+    };
+}
+
+
+const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white'
+    },
+    centered: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    list: {
+        width: '100%',
+    },
+    separator: {
+        marginTop: 10,
+    },
+    gridView: {
+        marginTop: 10,
+        flex: 1,
+      },
+      itemContainer: {
+        justifyContent: 'flex-start',
+        borderRadius: 10,
+        padding: 30,
+        height: 190,
+      },
+      itemName: {
+        fontSize: 20,
+        paddingBottom: 10,
+        color: '#fff',
+        fontWeight: '700',
+      },
+      itemDescription: {
+        fontWeight: '600',
+        fontSize: 14,
+        color: '#fff',
+      },
+      appButtonContainer: {
+        elevation: 8,
+        backgroundColor: "#009688",
+        borderRadius: 10,
+        paddingVertical: 10,
+        paddingHorizontal: 12
+      },
+      appButtonText: {
+        fontSize: 18,
+        color: "#fff",
+        fontWeight: "bold",
+        alignSelf: "center",
+        textTransform: "uppercase"
+      },
+
+
+})
+
+export default AllPostsScreen;

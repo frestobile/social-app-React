@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 import {
     StyleSheet,
     Text,
+    SafeAreaView,
+    ScrollView,
     View,
-    TextInput,
-    TouchableOpacity,
+    StatusBar,
     Image,
-    ActivityIndicator,
+    Hyperlink,
 } from 'react-native';
 
 import { showMessage } from "react-native-flash-message";
 
-import * as authActions from '../../store/actions/auth';
 import { useDispatch } from 'react-redux';
 import Colors from '../../constants/Colors';
 
-const ForgotPasswordScreen = () => {
+const TicketsScreen = () => {
 
     const [email, setEmail] = useState('');
 
@@ -39,75 +39,16 @@ const ForgotPasswordScreen = () => {
     }
 
 
-    const AuthHandler = async () => {
-        setIsLoading(true);
-        if(validateAuthForm()){
-            try {
-                const msg = await dispatch(authActions.forgotPassword(email))
-                showMessage({
-                    message: msg,
-                    type: "success",
-                    icon: { icon: "success", position: 'left' },
-                    duration: 4000
-                });
-                setEmail('');
-            } catch (error) {
-                showMessage({
-                    message: error.message,
-                    type: "danger",
-                    icon: { icon: "danger", position: 'left' },
-                    duration: 3000
-                });
-            }
-        }
-        setIsLoading(false);
-    };
-
-
     return (
-            <View style={styles.container}>
-                <Image style={styles.bgImage} source={require('../../assets/bg-auth.png')} />
-                {/* { error !== null && (
-                    <View style={styles.errorMsgContainer} >
-                        <Image style={styles.msgIcon} source={{ uri: "https://i.imgur.com/GnyDvKN.png" }} />
-                        <Text style={styles.msgText}> {error} </Text>
-                    </View>
-                )} */}
-                <View style={styles.inputContainer}>
-                    <TextInput style={styles.inputs}
-                        placeholder="Enter Email"
-                        keyboardType="email-address"
-                        underlineColorAndroid='transparent'
-                        value={email}
-                        onChangeText={(text) => setEmail(text)}
-                    />
-                    <Image style={styles.inputIcon} source={{ uri: 'https://img.icons8.com/nolan/40/000000/email.png' }} />
-                </View>
-
-                <TouchableOpacity 
-                    style={[styles.buttonContainer, styles.loginButton]}
-                    onPress={AuthHandler}
-                >
-
-                    { isLoading ? (
-                        <ActivityIndicator size="small" color="#fff" />
-                    )  :(
-                        <Text style={styles.loginText}>
-                            Send Password Reset Link
-                        </Text>
-                    ) }
-                    
-                </TouchableOpacity>
-            </View>    
+        <SafeAreaView style={styles.container}>
+            <ScrollView style={styles.scrollView}>
+              <Text style={{ fontSize: 24, fontWeight: 'bold',marginVertical: 15 }} >Tickets & Discount</Text>
+              <Image source={require('../../assets/aquarium.gif')} />
+              
+              <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Long Beach, CA</Text>
+            </ScrollView>
+         </SafeAreaView>
     );
-}
-
-
-export const screenOptions = (navData) => {
-    return{
-        headerTitle: 'Reset Password',
-        
-    }
 }
 
 const resizeMode = 'center';
@@ -116,8 +57,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#DCDCDC',
+        alignItems: 'flex-start',
+        backgroundColor: '#FFF',
+        marginLeft: 10,
+        paddingTop: StatusBar.currentHeight,
+    },
+    text: {
+        fontSize: 15,
     },
     errorMsgContainer:{
         display: 'flex',
@@ -157,7 +103,10 @@ const styles = StyleSheet.create({
         // marginLeft: 15,
         justifyContent: 'center'
     },
-
+    scrollView: {
+        backgroundColor: '#F5FCFF',
+        marginHorizontal: 10,
+    },
     inputContainer: {
         borderBottomColor: '#F5FCFF',
         backgroundColor: '#FFFFFF',
@@ -253,4 +202,4 @@ const styles = StyleSheet.create({
 }); 
 
 
-export default ForgotPasswordScreen;
+export default TicketsScreen;
