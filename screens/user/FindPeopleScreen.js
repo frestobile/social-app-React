@@ -11,9 +11,10 @@ import UserList from '../../components/UI/UserList';
 import { useDispatch, useSelector } from 'react-redux';
 import * as usersActions from '../../store/actions/users';
 import Colors from '../../constants/Colors';
-
+import * as authActions from '../../store/actions/auth';
 import { Container, Header, Item, Input, Icon, Button } from 'native-base';
 import VerifiedUser from '../../constants/VerifiedUser';
+import { useFocusEffect , useNavigationState } from '@react-navigation/core';
 
 const FindPeopleScreen = (props) => {
 
@@ -43,6 +44,18 @@ const FindPeopleScreen = (props) => {
         setIsRefreshing(false);
     }, [dispatch, setIsLoading, setError])
 
+    useFocusEffect(
+        React.useCallback(()=> {
+            changeTabRoute(true)
+            return () => {
+                changeTabRoute(false)
+            }
+        })
+    )
+
+    const changeTabRoute = async (status) => {
+        await dispatch(authActions.changeSocialState(status))
+    }
     
     useEffect(() => {
         setIsLoading(true);
@@ -120,7 +133,7 @@ const FindPeopleScreen = (props) => {
                     <Input
                         value={searchText}
                         onChangeText={(text) => handleSearchTextChange(text)}
-                        placeholder={`Search by name or email...`}
+                        placeholder={`Search members...`}
                     />
                     <Text>{data.length}</Text>
                     <Icon name="ios-people"  />

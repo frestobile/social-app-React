@@ -10,11 +10,12 @@ import {
     ScrollView 
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-
+import * as authActions from '../../store/actions/auth';
 import * as postActions from '../../store/actions/posts';
 import ImgPicker from '../../components/app/ImgPicker';
 import Colors from '../../constants/Colors';
 import { showMessage } from "react-native-flash-message";
+import { useFocusEffect } from '@react-navigation/core';
 
 const AddPostScreen = (props) => {
 
@@ -38,6 +39,20 @@ const AddPostScreen = (props) => {
         setIsLoading(false);
     }
 
+    useFocusEffect(
+        React.useCallback(()=> {
+            changeTabRoute(true)
+            return () => {
+                changeTabRoute(false)
+            }
+        })
+    )
+
+    const changeTabRoute = async (status) => {
+        await dispatch(authActions.changeSocialState(status))
+    }
+    
+
     useEffect(() => {
         const unsubscribe = props.navigation.addListener('focus', clearForm);
 
@@ -51,9 +66,9 @@ const AddPostScreen = (props) => {
         let sizeInBytes = 4 * Math.ceil((strLength / 3))*0.5624896334383812;
         let sizeInKb = sizeInBytes/1000;
         console.log(sizeInKb);
-        if(sizeInKb > 100){
+        if(sizeInKb > 10000){
             showMessage({
-                message: "Image size should be less than 150KB.",
+                message: "Image size should be less than 10MB.",
                 type: "danger",
                 duration: 3000,
                 icon: { icon: "danger", position: 'left' }
@@ -100,7 +115,7 @@ const AddPostScreen = (props) => {
             try {
                 await dispatch(postActions.createPost(title, body, base64Data, imageType));
                 clearForm();
-                props.navigation.navigate('AllPosts')
+                props.navigation.navigate('Feed')
                 showMessage({
                     message: "Your post was successfully created.",
                     type: "success",
@@ -114,7 +129,7 @@ const AddPostScreen = (props) => {
                     duration: 3000,
                     icon: { icon: "danger", position: 'left' }
                 });
-                console.log("ERROR ",error.message);
+                console.log("ERROR here is the problem!!! --> ",error.message);
             }
         } 
         setIsLoading(false);
@@ -126,8 +141,9 @@ const AddPostScreen = (props) => {
     }
 
     return(
+        <View style={{flex: 1}}>
         <ScrollView  >
-            <KeyboardAvoidingView style={styles.screen} behavior="padding" >
+            {/* <KeyboardAvoidingView style={styles.screen} behavior="padding" > */}
                 <View style={styles.container}>
                     {/* { error !== null && (
                         <View style={styles.errorMsgContainer} >
@@ -135,12 +151,9 @@ const AddPostScreen = (props) => {
                             <Text style={styles.msgText}> {error} </Text>
                         </View>
                     )} */}
-                    <ImgPicker 
-                        onImageTaken={imagePickedHandler}
-                        clearPickedImage={clearPickedImage}
-                    />
+
                     <View style={styles.labelContainer} >
-                        <Text style={styles.labelText} >Title</Text>
+                        <Text style={styles.labelText} >Board Topic</Text>
                     </View>
                     <View style={styles.inputContainer}>
                         <TextInput style={styles.inputs}
@@ -151,38 +164,47 @@ const AddPostScreen = (props) => {
                         />
                     </View>
                     <View style={styles.labelContainer} >
-                        <Text style={styles.labelText} >Body</Text>
+                        <Text style={styles.labelText} >Description</Text>
                     </View>
-                    <View style={styles.inputContainer}>
-                        <TextInput style={styles.inputs}
-                            placeholder="Body"
+                    <View style={styles.inputDecpriptionContainer}>
+                        <TextInput style={styles.inputDescription}
+                            placeholder="Description"
                             underlineColorAndroid='transparent'
                             value={body}
                             onChangeText={(text) => setBody(text) }
                         />
                     </View>
-                    <TouchableOpacity 
-                        style={[styles.buttonContainer, styles.loginButton]}
-                        onPress={createPost}
-                    >
-                        { isLoading ? (
-                            <ActivityIndicator size="small" color="#fff" />
-                        )  :(
-                            <Text style={styles.loginText}>
-                                Post
-                            </Text>
-                        ) }
-                        
-                    </TouchableOpacity>
+                   
+                    <ImgPicker 
+                        onImageTaken={imagePickedHandler}
+                        clearPickedImage={clearPickedImage}
+                    />
                 </View>
-            </KeyboardAvoidingView>
+            {/* </KeyboardAvoidingView> */}
         </ScrollView>
+            <View style={{justifyContent:  'center', alignItems:  'center'  }}>
+                <TouchableOpacity 
+                    style={[styles.buttonContainer, styles.loginButton]}
+                    onPress={createPost}
+                >
+                    { isLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    )  :(
+                        <Text style={styles.loginText}>
+                            Add the Topic
+                        </Text>
+                    ) }                        
+                </TouchableOpacity>   
+            </View> 
+        </View>
+        
     );
 };
 
 
 export const screenOptions = {
-    headerTitle: 'Create Post'
+    headerTitle: 'Create Board Post',
+    tabBarVisible: false,
 }
 
 const styles = StyleSheet.create({
@@ -250,8 +272,34 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
     },
+    inputDecpriptionContainer: {
+        // borderBottomColor: '#F5FCFF',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 30,
+        // borderBottomWidth: 1,
+        width: 300,
+        height: 90,
+        marginBottom: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        shadowColor: "#808080",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
     inputs: {
         height: 45,
+        marginLeft: 16,
+        borderBottomColor: '#FFFFFF',
+        flex: 1,
+        paddingRight: 15
+    },
+    inputDescription: {
+        height: 90,
         marginLeft: 16,
         borderBottomColor: '#FFFFFF',
         flex: 1,
@@ -262,22 +310,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 10,
         width: 300,
         borderRadius: 30,
         backgroundColor: 'transparent'
     },
     loginButton: {
         backgroundColor: Colors.brightBlue,
-        shadowColor: "#808080",
-        shadowOffset: {
-            width: 0,
-            height: 9,
-        },
-        shadowOpacity: 0.50,
-        shadowRadius: 12.35,
+        // shadowColor: "#808080",
+        // shadowOffset: {
+        //     width: 0,
+        //     height: 9,
+        // },
+        // shadowOpacity: 0.50,
+        // shadowRadius: 12.35,
 
-        elevation: 10,
+        // elevation: 10,
     },
     loginText: {
         color: 'white',

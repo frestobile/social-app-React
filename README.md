@@ -1,4 +1,3 @@
-
 # SocialApp-React-Native
 
 Social Networking mobile app similar to Instagram in React Native.

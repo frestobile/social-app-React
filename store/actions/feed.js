@@ -4,14 +4,13 @@ export const DELETE_POST = "DELETE_PRODUCT";
 export const CREATE_POST = "CREATE_PRODUCT";
 export const UPDATE_POST = "UPDATE_PRODUCT";
 export const SET_POSTS = 'SET_POSTS';
-export const SET_POSTS_BOARD = 'SET_POSTS_BOARD';
 export const LIKE_POST = 'LIKE_POST';
 export const UNLIKE_POST = 'UNLIKE_POST';
 export const COMMENT_POST = 'COMMENT_POST';
 export const UNCOMMENT_POST = 'UNCOMMENT_POST';
 export const ADD_COMMENT_TEMP = 'ADD_COMMENT_TEMP';
 
-export const fetchPosts = () => {
+export const fetchFeeds = () => {
     return async (dispatch, getState) => {
         const response = await fetch(`${ENV.apiUrl}/rn/allposts`);
 
@@ -24,23 +23,6 @@ export const fetchPosts = () => {
         dispatch({
             type: SET_POSTS,
             posts: resData
-        })
-    }
-};
-
-export const fetchBoardPosts = () => {
-    return async (dispatch, getState) => {
-        const response = await fetch(`http://go.bestfaretravelo.com/wp-json/wp/v2/posts`);
-
-        const resData = await response.json();
-        if(resData.error){
-            throw new Error(resData.error);
-        }
-
-        // console.log('TESTDA:: ', resData[0]);
-        dispatch({
-            type: SET_POSTS_BOARD,
-            boardPosts: resData
         })
     }
 };
@@ -70,7 +52,7 @@ export const createPost = (title, body, base64Data, imageType) => {
 
         dispatch({
             type: CREATE_POST,
-            postData: {
+            feedData: {
                 _id: resData._id,
                 title: resData.title,
                 body: resData.body,
@@ -87,10 +69,10 @@ export const createPost = (title, body, base64Data, imageType) => {
 };
 
 
-export const deletePost = (postId) => {
+export const deletePost = (feedId) => {
     return async (dispatch, getState) => {
         const token = getState().auth.token;
-        const response = await fetch(`${ENV.apiUrl}/post/${postId}`, {
+        const response = await fetch(`${ENV.apiUrl}/post/${feedId}`, {
             method: "DELETE",
             headers: {
                 Accept: "application/json",
@@ -105,23 +87,23 @@ export const deletePost = (postId) => {
         }
         dispatch({
             type: DELETE_POST,
-            pid: postId
+            pid: feedId
         })
     }
 };
 
 
-export const updatePost = (postId,title, body, base64Data, imageType) => {
+export const updatePost = (feedId,title, body, base64Data, imageType) => {
     return async (dispatch, getState) => {
         const token = getState().auth.token;
-        let postData;
+        let feedData;
         // const userId = getState().auth.user._id;
         if( !base64Data || !imageType || (base64Data === '' && imageType === '')){
-            postData = {title, body}
+            feedData = {title, body}
         } else {
-            postData = {title, body, base64Data, imageType}
+            feedData = {title, body, base64Data, imageType}
         }
-        const response = await fetch(`${ENV.apiUrl}/rn/post/${postId}`, {
+        const response = await fetch(`${ENV.apiUrl}/rn/post/${feedId}`, {
             method: "PUT",
             headers: {
                 'Content-Type': "application/json",
@@ -153,7 +135,7 @@ export const updatePost = (postId,title, body, base64Data, imageType) => {
 };
 
 
-export const likePost = (postId) => {
+export const likePost = (feedId) => {
     return async (dispatch, getState) => {
         const token = getState().auth.token;
         const userId = getState().auth.user._id;

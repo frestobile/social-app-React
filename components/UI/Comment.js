@@ -74,7 +74,10 @@ const styles = StyleSheet.create({
         paddingRight: 16,
         paddingVertical: 12,
         flexDirection: 'row',
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
+        backgroundColor:'#cecece',
+        borderRadius:10,
+        margin:3
     },
     content: {
         marginLeft: 16,

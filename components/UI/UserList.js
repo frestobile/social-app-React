@@ -93,11 +93,6 @@ const UserList = (props) => {
                             <>{item.email}</>
                         )}
                     </Text>
-                    <TouchableOpacity style={styles.followButton}>
-                        <Text
-                            onPress={followUserHandler}
-                            style={styles.followButtonText}>Follow</Text>
-                    </TouchableOpacity>
                 </View>
             </View>
         </TouchableOpacity>
